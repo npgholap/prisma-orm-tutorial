@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model StudentInfo {
+  id         Int                @id @default(autoincrement())
+  firstName  String
+  lastName   String
+  branchName String
+  subjects   StudentonSubject[]
+  attendance Attendance[]
+  academic AcademicInfo[]
+}
+
+model SubjectInfo {
+  id          Int                @id @default(autoincrement())
+  subjectName String
+  type        String
+  students    StudentonSubject[]
+  faculty     FacultyInfo        @relation(fields: [facultyId], references: [id])
+  facultyId   Int
+  attendance Attendance[]
+  academic AcademicInfo @relation(fields: [academicId], references: [id])
+  academicId Int
+}
+
+model StudentonSubject {
+  id        Int         @id @default(autoincrement())
+  student   StudentInfo @relation(fields: [studentId], references: [id])
+  studentId Int
+  subject   SubjectInfo @relation(fields: [subjectId], references: [id])
+  subjectId Int
+ }
+
+model AcademicInfo {
+  id           Int    @id @default(autoincrement())
+  class        String
+  semester     String
+  academicYear String
+  subject SubjectInfo[]
+  student StudentInfo @relation(fields: [studentId], references: [id])
+  studentId Int
+}
+
+model Attendance {
+  id            Int      @id @default(autoincrement())
+  dateoflecture DateTime
+  time          String
+  status        String
+  student StudentInfo @relation(fields: [studentId], references: [id])
+  studentId Int
+  subject SubjectInfo @relation(fields: [subjectId], references: [id])
+  subjectId Int
+}
+
+model FacultyInfo {
+  id         Int           @id @default(autoincrement())
+  firstName  String
+  lastName   String
+  department String
+  subjects   SubjectInfo[]
+}
